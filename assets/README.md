@@ -22,7 +22,7 @@
 | `go/declorder/` | 声明顺序检查与自动归位（go/ast） | 基本通用 |
 | `config/golangci.yml`、`config/go-Makefile`、`config/eslint.*.mjs` | lint 与护栏配置 | 分层规则中的目录与包路径、框架预设 |
 | `conventions/*.CONVENTIONS.md` | 模块 CONVENTIONS（通用规则 + 本仓库写法与正反例） | 全部内容 |
-| `AGENTS.example.md` | 根 AGENTS 的结构（何时读、工具表、纠正回路） | 全部内容 |
-| `module-AGENTS.example.md` | 模块 AGENTS 的结构（核心原则、何时读、验证入口） | 分层、对外契约与验证命令 |
+| `AGENTS.example.md` | 根 AGENTS 的结构（参考文档、纠正回路、验证流程） | 全部内容 |
+| `module-AGENTS.example.md` | 模块 AGENTS 的结构（核心原则、参考文档、验证入口） | 分层、对外契约与验证命令 |
 
 重写完成后，按 [../references/adopt.md](../references/adopt.md) 各阶段的完成标准验证。

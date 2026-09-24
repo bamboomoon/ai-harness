@@ -45,7 +45,9 @@ function existingDir(dir) {
 // 拿不到会话记录时放行，不因 hook 环境差异卡住编辑。
 // ponytail: 只认带模块前缀的路径，在模块目录里 `cat CONVENTIONS.md` 不计入；会话压缩后早先的读取仍计入。
 function toolCallsInTranscripts() {
-  const paths = [input.transcript_path, input.agent_transcript_path].filter((path) => path && existsSync(path));
+  const paths = [input.transcript_path, input.agent_transcript_path].filter(
+    (path) => path && existsSync(path),
+  );
   if (!paths.length) return null;
   const calls = [];
   for (const line of paths.flatMap((path) => readFileSync(path, 'utf8').split('\n'))) {
@@ -60,7 +62,8 @@ function toolCallsInTranscripts() {
 
 function collectCalls(node, calls) {
   if (!node || typeof node !== 'object') return;
-  if (CALL_TYPES.has(node.type) && !WRITE_TOOLS.has(node.name)) calls.push(JSON.stringify(node.input ?? node.arguments ?? node.action ?? node));
+  if (CALL_TYPES.has(node.type) && !WRITE_TOOLS.has(node.name))
+    calls.push(JSON.stringify(node.input ?? node.arguments ?? node.action ?? node));
   for (const value of Object.values(node)) collectCalls(value, calls);
 }
 

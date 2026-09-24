@@ -19,14 +19,25 @@ Go（Gin、pgx + sqlc、PostgreSQL、Redis）业务后端。本文件写 server 
 - **注释只写 why**：写动机、约束、取舍与踩过的坑，关联需求时附 issue 链接（如 `#123`）；不写复述代码的 what 注释——agent 写的 what 注释多半在为短期 hack 找补，最先过时。修改到的函数上已有的 what 注释顺手删除或改写为 why。注释用中文。
 - **删除优于兼容**：内部重构直接删除旧实现并更新全部调用方，不留兼容层、deprecated 转发或双写；对外契约（HTTP API、数据库迁移）的兼容性单独评估，改动前说明影响并经用户确认。
 
-## 何时读
+## 参考文档
 
-| 何时                           | 读                               |
-| ------------------------------ | -------------------------------- |
-| 写、改或审查本模块代码（必读） | [CONVENTIONS.md](CONVENTIONS.md) |
-| 了解目录结构与启动             | [README.md](README.md)           |
-| 新增或修改 E2E 场景            | [e2e/WRITING.md](e2e/WRITING.md) |
+| 文件                                               | 作用                                               |
+| -------------------------------------------------- | -------------------------------------------------- |
+| [CONVENTIONS.md](CONVENTIONS.md)                   | 本模块的编码约定与正反例（写、改或审查代码前必读） |
+| [README.md](README.md)                             | 模块概览与本地运行                                 |
+| [docs/model-providers.md](docs/model-providers.md) | 模型提供方接口契约                                 |
+| [docs/models.md](docs/models.md)                   | 模型管理接口契约                                   |
+| [e2e/README.md](e2e/README.md)                     | E2E 怎么运行                                       |
+| [e2e/WRITING.md](e2e/WRITING.md)                   | E2E 怎么写                                         |
 
 ## 验证
 
-在 `server/` 执行 `make check`、`make test`；`make integration` 与 `make e2e` 在 Docker 临时环境中运行，无需准备数据库或账号。工具版本锁在 `tools.mod`，通过 make 目标运行，无需全局安装。
+在 `server/` 执行，工具版本锁在 `tools.mod`，无需全局安装：
+
+1. `make check`：L0 静态检查。
+2. `make test`：L1 单元测试。
+3. `make integration`：L2 集成测试，在 Docker 临时 PostgreSQL/Redis 中运行；改动读写存储时必跑。
+4. `make e2e`：L3 E2E，在临时环境中运行生产进程；改动 HTTP 或 CLI 入口时必跑。
+5. `make e2e LABEL=real-llm`：L4 真实模型，可能收费，经用户同意后手动运行。
+
+1–2 由回合结束 hook 自动运行；3–4 由交付关卡 `scripts/verify-delivery.sh` 统一运行。

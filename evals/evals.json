@@ -1,10 +1,16 @@
 [
   {
     "id": "discover-stale-readme",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "Node TypeScript 服务：README 写 `npm run test`，package.json 实际只有 `test:unit`；另有一个需要 PostgreSQL 的集成测试脚本",
     "query": "用 agent-harness 看看这个项目现在的情况，先别改东西。",
-    "user_answers": {"agents": "Claude Code", "corrections": "无", "constraints": "可以用 Docker"},
+    "user_answers": {
+      "agents": "Claude Code",
+      "corrections": "无",
+      "constraints": "可以用 Docker"
+    },
     "expected_behavior": [
       "逐条实际运行候选命令，输出「模块 × 命令 × 实测结果」表",
       "指出 README 中的 `npm run test` 不存在，以 package.json 为准",
@@ -14,40 +20,59 @@
   },
   {
     "id": "init-go-service",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "空仓库，仅 `go mod init example.com/svc` 与一个返回 200 的 net/http main.go",
     "query": "这是个新的 Go 服务，帮我用 agent-harness 把 AI coding 的机制搭起来。",
-    "user_answers": {"agents": "Claude Code 和 Codex", "corrections": "HTTP handler 里不要写 SQL", "tools": "只用 gh CLI", "constraints": "GitHub Actions，可以用 Docker"},
+    "user_answers": {
+      "agents": "Claude Code 和 Codex",
+      "corrections": "HTTP handler 里不要写 SQL",
+      "constraints": "GitHub Actions，可以用 Docker"
+    },
     "expected_behavior": [
-      "向用户确认使用的 agent、纠正案例与工具清单后再动手，而不是自行决定",
+      "向用户确认使用的 agent、纠正案例与工具用法约定后再动手，而不是自行决定",
       "提供单一 check 入口（格式、lint、类型），故意写一个 handler 直接导入数据库包的违规会被 check 拦下",
       "server 模块 AGENTS 含核心原则（含 Go 要点）；CONVENTIONS 由 assets/style/go.md 生成，没有模板措辞，每条规则有本仓库正例",
       "模块规则写在 CONVENTIONS.md，纠正「handler 不写 SQL」落在 lint（depguard）或 CONVENTIONS，并说明选择理由",
-      "根 AGENTS 含必读 CONVENTIONS 提示、工具表只有 gh、纠正回路及落点表",
+      "根 AGENTS 含必读 CONVENTIONS 提示、参考文档表、纠正回路及落点表，没有工具表",
       "Claude Code 与 Codex 的 hook 都已注册，并用模拟输入验证过触发",
       "CI 配置使用与本地相同的 check 命令"
     ]
   },
   {
     "id": "init-nextjs-app",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "固定版本 create-next-app（TypeScript、App Router、ESLint）生成的仓库",
     "query": "新建的 Next.js 项目，按 agent-harness 初始化。",
-    "user_answers": {"agents": "Claude Code", "corrections": "事件处理函数不要直接传 async", "tools": "shadcn CLI、浏览器 MCP", "constraints": "不能用 Docker"},
+    "user_answers": {
+      "agents": "Claude Code",
+      "corrections": "事件处理函数不要直接传 async",
+      "constraints": "不能用 Docker",
+      "tool_rules": "浏览器 MCP 只用来排查，不能代替 E2E"
+    },
     "expected_behavior": [
       "启用 typescript-eslint 类型感知规则，`onClick={async () => ...}` 被 no-misused-promises 拦下",
       "用户说不能用 Docker 时，端到端测试不依赖容器，并在报告中说明替代方案与代价",
       "模块 AGENTS 含核心原则（含 TypeScript 要点）；写法与正反例写在 CONVENTIONS.md，没有另建风格 skill",
-      "工具表只有 shadcn CLI 与浏览器 MCP，浏览器 MCP 注明本地已配置时",
+      "「浏览器 MCP 只用于排查，结论以 E2E 为准」写进 web CONVENTIONS，没有另建工具表",
       "没有为不存在的层（如 L2 集成）建空骨架"
     ]
   },
   {
     "id": "adopt-java-existing-lint",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "Spring Boot 项目副本：已有 Checkstyle 与 Spotless、JUnit 单元测试、依赖共享开发库的集成测试、无 AGENTS.md",
     "query": "这个 Java 项目想引入 agent-harness 的机制。",
-    "user_answers": {"agents": "Codex", "corrections": "private 方法放在第一次调用它的方法后面；Controller 里不要 try-catch", "tools": "gh CLI", "constraints": "可以用 Docker"},
+    "user_answers": {
+      "agents": "Codex",
+      "corrections": "private 方法放在第一次调用它的方法后面；Controller 里不要 try-catch",
+      "constraints": "可以用 Docker"
+    },
     "expected_behavior": [
       "沿用 Checkstyle 与 Spotless，只补缺失项，没有换成别的工具",
       "按阶段推进，每阶段结束汇报并等待用户确认；计划写入仓库内过程文档",
@@ -58,10 +83,15 @@
   },
   {
     "id": "adopt-project-rules-in-skill",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "Go 仓库：有一个项目级风格 skill `.agents/skills/go-style/`，混有通用原则与本仓库路径、错误码约定；模块 AGENTS 有一段必守规则",
     "query": "用 agent-harness 整理一下这个仓库的规则文档。",
-    "user_answers": {"agents": "Claude Code", "corrections": "无", "tools": "gh CLI"},
+    "user_answers": {
+      "agents": "Claude Code",
+      "corrections": "无"
+    },
     "expected_behavior": [
       "通用原则并入模块 AGENTS 核心原则，写法与本仓库约定并入模块 CONVENTIONS.md，然后删除该 skill",
       "模块 AGENTS 只剩路由与验证入口，首行必读指向 CONVENTIONS",
@@ -71,7 +101,9 @@
   },
   {
     "id": "correct-module-rule",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "已完成 init 的 Go 仓库，其中一个 service 手写了与 binding 标签重复的格式校验",
     "query": "纠正一下：HTTP 入参的格式校验只写在 binding 标签上，service 里不要再写一遍。",
     "user_answers": {},
@@ -84,7 +116,9 @@
   },
   {
     "id": "correct-generic-style",
-    "skills": ["agent-harness"],
+    "skills": [
+      "agent-harness"
+    ],
     "fixture": "已完成 init 的 TypeScript 仓库",
     "query": "以后互斥的状态用可辨识联合，不要用一堆可选字段拼。",
     "user_answers": {},

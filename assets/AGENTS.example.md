@@ -4,24 +4,17 @@
 
 **写、改或审查任何模块的代码之前，先完整阅读该模块的 `CONVENTIONS.md`**（`server/`、`web/`、`daemon/` 各一份）。它是本模块规则的唯一来源，没读就动手的改动按未遵守约定处理；交付说明里列出本次读过的 CONVENTIONS。
 
-## 何时读
+## 参考文档
 
-| 何时                                   | 读                                                                                         |
-| -------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 命名业务概念，写 issue、规格或测试描述 | [CONTEXT.md](CONTEXT.md)                                                                   |
-| 改动触及已记录的设计取舍               | [docs/adr/](docs/adr/)                                                                     |
-| 处理 issue、规格或分诊                 | [issue tracker](docs/agents/issue-tracker.md)、[分诊标签](docs/agents/triage-labels.md)    |
-| 一次改动跨多个模块                     | 每个受影响模块的 AGENTS.md                                                                 |
-| 新增或修改 E2E 场景                    | [server E2E 编写指南](server/e2e/WRITING.md)、[web E2E 编写指南](web/tests/e2e/WRITING.md) |
-
-## 工具
-
-| 何时                             | 用                                                                                                                         |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| 定位代码、理解调用关系与影响范围 | CodeGraph：MCP `codegraph_explore`，或 `codegraph explore "<符号或问题>"`（本地有 `.codegraph/` 索引时；否则用搜索与阅读） |
-| 需求、issue、PR 与 CI 结果       | `gh` CLI（见 [issue tracker](docs/agents/issue-tracker.md)）                                                               |
-| 查询、安装、更新 UI 组件         | shadcn CLI（见 [web 约定](web/CONVENTIONS.md#ui-组件)）                                                                    |
-| 在浏览器里核对界面行为           | 浏览器 MCP（Claude Code：claude-in-chrome；Codex：chrome-devtools），本地已配置时；结论仍以 E2E 断言为准                   |
+| 文件                                                                                                       | 作用                   |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------- |
+| [CONTEXT.md](CONTEXT.md)                                                                                   | 业务术语与概念定义     |
+| [docs/adr/](docs/adr/)                                                                                     | 已记录的架构与设计决策 |
+| [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md)                                               | 需求与工作项的管理方式 |
+| [docs/agents/triage-labels.md](docs/agents/triage-labels.md)                                               | issue 分诊标签         |
+| [server/AGENTS.md](server/AGENTS.md)、[web/AGENTS.md](web/AGENTS.md)、[daemon/AGENTS.md](daemon/AGENTS.md) | 各模块的开发指引       |
+| [server/e2e/WRITING.md](server/e2e/WRITING.md)                                                             | server E2E 怎么写      |
+| [web/tests/e2e/WRITING.md](web/tests/e2e/WRITING.md)                                                       | web E2E 怎么写         |
 
 ## 纠正回路
 
@@ -47,10 +40,14 @@
 
 - 层级：L0 静态、L1 单元、L2 集成（临时 PostgreSQL/Redis）、L3 E2E、L4 真实外部（模型、E2B，按需手动）。
 - 行为变更在能观察到它的最低一层补测试；修 bug 先写在旧实现上失败的测试；读写存储的行为交给 L2。
-- hook 自动执行：编辑模块代码前核对本会话是否读过该模块 CONVENTIONS，没读则拒绝这次编辑；编辑后格式化并修复该文件；回合结束对改动模块运行 check 与单元测试、测试防篡改与先红后绿检查，失败或出现新的待审项会退回。
-- 交付前：在仓库根目录运行 `scripts/verify-delivery.sh`（受影响模块的 L2/L3 与改动行变异测试）；对 diff 做一次独立审查（Claude Code 用 `code-review`，Codex 用 `/review`，标准为模块 AGENTS 的核心原则与 CONVENTIONS）。阶段性汇报或提问的回合写明「未交付」。
-- 结论以本次实际执行为准，按层分别报告通过、失败、跳过与未运行；环境阻塞不算完成。
 - 保留工作区已有的他人改动，只清理本次创建的测试资源。
+
+验证流程：
+
+1. 编辑时（hook 自动）：编辑模块代码前核对本会话是否读过该模块 CONVENTIONS，没读则拒绝这次编辑；编辑后格式化并修复该文件。
+2. 回合结束（hook 自动）：对改动模块运行 check 与单元测试、测试防篡改与先红后绿检查，失败或出现新的待审项会退回。
+3. 交付前：在仓库根目录运行 `scripts/verify-delivery.sh`（受影响模块的 L2/L3 与改动行变异测试），再对 diff 做一次独立审查（Claude Code 用 `code-review`，Codex 用 `/review`，标准为模块 AGENTS 的核心原则与 CONVENTIONS）。阶段性汇报或提问的回合写明「未交付」。
+4. 汇报：结论以本次实际执行为准，按层分别报告通过、失败、跳过与未运行；环境阻塞不算完成。
 
 ## 交付说明
 

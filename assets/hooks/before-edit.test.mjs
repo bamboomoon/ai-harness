@@ -26,14 +26,24 @@ test('按会话记录中的工具调用判断是否读过模块 CONVENTIONS', ()
     };
     const mention = { type: 'user', message: { content: '先读 server/CONVENTIONS.md' } };
     const claudeRead = {
-      message: { content: [{ type: 'tool_use', name: 'Read', input: { file_path: join(repo, 'server/CONVENTIONS.md') } }] },
+      message: {
+        content: [
+          { type: 'tool_use', name: 'Read', input: { file_path: join(repo, 'server/CONVENTIONS.md') } },
+        ],
+      },
     };
     const claudeWrite = {
-      message: { content: [{ type: 'tool_use', name: 'Write', input: { content: 'server/CONVENTIONS.md' } }] },
+      message: {
+        content: [{ type: 'tool_use', name: 'Write', input: { content: 'server/CONVENTIONS.md' } }],
+      },
     };
     const codexRead = {
       type: 'response_item',
-      payload: { type: 'custom_tool_call', name: 'exec', input: 'tools.exec_command({cmd:"cat server/CONVENTIONS.md"})' },
+      payload: {
+        type: 'custom_tool_call',
+        name: 'exec',
+        input: 'tools.exec_command({cmd:"cat server/CONVENTIONS.md"})',
+      },
     };
     const newGoFile = { file_path: join(repo, 'server/internal/new/a.go') };
     const codexPatch = { input: '*** Begin Patch\n*** Update File: server/internal/a.go\n@@\n' };
@@ -45,9 +55,15 @@ test('按会话记录中的工具调用判断是否读过模块 CONVENTIONS', ()
     assert.equal(run(newGoFile, [claudeRead]).status, 0);
     assert.equal(run(codexPatch, [codexRead]).status, 0);
     assert.equal(run({ file_path: join(repo, 'server/README.md') }, []).status, 0, '文档不受约束');
-    assert.equal(run({ file_path: join(repo, 'scripts/a.mjs') }, []).status, 0, '没有 CONVENTIONS 的目录不受约束');
+    assert.equal(
+      run({ file_path: join(repo, 'scripts/a.mjs') }, []).status,
+      0,
+      '没有 CONVENTIONS 的目录不受约束',
+    );
 
-    const noTranscript = spawnSync('node', [hook], { input: JSON.stringify({ cwd: repo, tool_input: newGoFile }) });
+    const noTranscript = spawnSync('node', [hook], {
+      input: JSON.stringify({ cwd: repo, tool_input: newGoFile }),
+    });
     assert.equal(noTranscript.status, 0, '拿不到会话记录时放行');
   } finally {
     rmSync(repo, { recursive: true, force: true });

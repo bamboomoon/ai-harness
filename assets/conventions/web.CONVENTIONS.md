@@ -62,3 +62,4 @@ function save(event: FormEvent<HTMLFormElement>) {
 - 通过 `apiClient.defaults.adapter` 或 `vi.mock` 在边界替换外部依赖，断言用户可见结果与外发请求（参数、次数），不断言内部实现。
 - 修 bug 先写在旧实现上失败的测试。
 - 浏览器 E2E 走 `npm run test:e2e`；视觉意图写成 `toHaveCSS` 等明确断言，不做截图比对。
+- 本地浏览器 MCP（claude-in-chrome、chrome-devtools）只用于排查和核对界面，结论以 E2E 断言为准。

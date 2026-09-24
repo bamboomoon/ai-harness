@@ -46,7 +46,7 @@
 
 ## 7. 规则与文档
 
-- 按 [docs.md](docs.md) 重写根与模块 AGENTS（根 AGENTS 含必读 CONVENTIONS 提示、纠正落点表与用户确认过的工具表；模块 AGENTS 含核心原则），拆分端到端测试的运行文档与编写指南，归档过程文档。
+- 按 [docs.md](docs.md) 重写根与模块 AGENTS（根 AGENTS 含必读 CONVENTIONS 提示与纠正落点表；模块 AGENTS 含核心原则），拆分端到端测试的运行文档与编写指南，归档过程文档。
 - 完成标准：每个 AGENTS 只剩路由、推断不出的规则与验证入口；链接检查通过。
 
 ## 8. 对照实验

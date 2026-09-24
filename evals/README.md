@@ -26,6 +26,6 @@
 | 模式 | 用例 | 主要检查 |
 | --- | --- | --- |
 | discover | `discover-stale-readme` | 命令以实际运行为准，发现 README 过时 |
-| init | `init-go-service`、`init-nextjs-app` | 单一 check 入口、故意违规被拦、核心原则与 CONVENTIONS 由模板生成、AGENTS 结构、工具表经用户确认 |
+| init | `init-go-service`、`init-nextjs-app` | 单一 check 入口、故意违规被拦、核心原则与 CONVENTIONS 由模板生成、AGENTS 结构 |
 | adopt | `adopt-java-existing-lint`、`adopt-project-rules-in-skill` | 沿用已有工具、分阶段并由用户确认、项目规则移入 CONVENTIONS |
 | correct | `correct-module-rule`、`correct-generic-style` | 按适用范围落点、修掉坏样例、用当初的错误验证 |

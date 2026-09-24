@@ -28,10 +28,10 @@ description: "Use when setting up or improving how AI agents code in a repositor
 
 ## 参考
 
-| 何时 | 读 |
+| 文件 | 作用 |
 | --- | --- |
-| 写或重排 AGENTS.md、模块文档、归档 | [references/docs.md](references/docs.md) |
-| 设计测试分层、测试环境、验证工具、hook、交付关卡、CI | [references/verification.md](references/verification.md) |
-| 为某个技术栈挑选工具 | [references/stack-go.md](references/stack-go.md)、[references/stack-typescript.md](references/stack-typescript.md)、[references/stack-java.md](references/stack-java.md) |
-| 写模块核心原则与 CONVENTIONS（模板在 [assets/style/](assets/style/)） | [references/style.md](references/style.md) |
-| 需要一个参考实现来理解某个机制 | [assets/README.md](assets/README.md) |
+| [references/docs.md](references/docs.md) | AGENTS 与项目文档怎么写、怎么分工 |
+| [references/style.md](references/style.md) | 核心原则与模块 CONVENTIONS 怎么写（模板在 [assets/style/](assets/style/)） |
+| [references/verification.md](references/verification.md) | 测试与验证体系怎么搭 |
+| [references/stack-go.md](references/stack-go.md)、[references/stack-typescript.md](references/stack-typescript.md)、[references/stack-java.md](references/stack-java.md) | 各技术栈的工具选择 |
+| [assets/README.md](assets/README.md) | 参考实现及其需按项目重写的部分 |
