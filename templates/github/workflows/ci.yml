@@ -1,0 +1,239 @@
+# 与本地使用同一套入口：模块 check/test（L0/L1），scripts/test-env.sh 临时环境中的 integration/e2e（L2/L3）。
+# 真实模型与 E2B（L4）需要凭据，不在 CI 中运行。每个测试 job 把关键数字写入运行总结，最后由「总结」汇总各层结果。
+name: CI
+
+# 同仓库分支的 PR 直接显示推送产生的检查，不再重复按 pull_request 触发。
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# 显式 bash 启用 pipefail，测试输出经 tee 保存时仍以测试退出码为准。
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  docs:
+    name: 仓库 · 文档链接 + 工作流 + 验证脚本自测
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: 检查 Markdown 相对链接
+        run: node scripts/check-doc-links.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: 检查 GitHub Actions 工作流（actionlint）
+        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.12
+      - name: 验证脚本自测（防篡改检查等）
+        run: node --test scripts/*.test.mjs
+
+  verification:
+    name: 验证工具 · 测试防篡改 + 先红后绿 + 变异测试（相对 main）
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/*.sum
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            web/package-lock.json
+            daemon/package-lock.json
+      - run: npm ci --prefix web && npm ci --prefix daemon --ignore-scripts
+      - name: 确定对比基准
+        # 分支与 main 的合并基点；main 自身的推送与上一个提交对比。
+        run: |
+          base="$(git merge-base origin/main HEAD)"
+          [[ "$base" == "$(git rev-parse HEAD)" ]] && base="$(git rev-parse HEAD~1)"
+          echo "BASE=$base" >> "$GITHUB_ENV"
+          echo "对比基准：\`$base\`" >> "$GITHUB_STEP_SUMMARY"
+      - name: 测试防篡改检查（标记待审，不阻断）
+        run: node scripts/test-guard.mjs --base "$BASE" --github
+      - name: 先红后绿证明（当前实现失败时阻断）
+        run: node scripts/red-green.mjs --base "$BASE" --github
+      - name: 变异测试（仅改动行，只出报告）
+        run: scripts/test-env.sh node scripts/mutation.mjs --base "$BASE" --github
+
+  server:
+    name: Server · L0 静态检查 + L1 单元测试
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/*.sum
+      - name: L0 静态检查（golangci-lint、函数顺序、sqlc 一致性）
+        run: make check
+      - name: L1 单元测试
+        run: make test | tee "$RUNNER_TEMP/unit.log"
+      - name: 写入总结
+        if: always()
+        run: |
+          {
+            echo "### Server · L1 单元测试"
+            echo "- 通过的包：$(grep -c '^ok' "$RUNNER_TEMP/unit.log" || true)"
+            echo "- 失败的包：$(grep -c '^FAIL' "$RUNNER_TEMP/unit.log" || true)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  server-integration:
+    name: Server · L2 集成 + L3 E2E（临时 PG/Redis）
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/*.sum
+      - name: L2 集成测试（服务与仓库 × 真实 PostgreSQL）
+        run: make integration | tee "$RUNNER_TEMP/integration.log"
+      - name: L3 E2E（生产进程 × 真实 HTTP/PG/Redis，跳过 real-llm）
+        run: make e2e | tee "$RUNNER_TEMP/e2e.log"
+      - name: 写入总结
+        if: always()
+        run: |
+          {
+            echo "### Server · L2 集成测试"
+            echo "- 通过的包：$(grep -c '^ok' "$RUNNER_TEMP/integration.log" 2>/dev/null || true)"
+            echo "- 失败的包：$(grep -c '^FAIL' "$RUNNER_TEMP/integration.log" 2>/dev/null || true)"
+            echo "### Server · L3 E2E"
+            grep -E '^Ran [0-9]+ of [0-9]+ Specs|Passed \| [0-9]+ Failed' "$RUNNER_TEMP/e2e.log" 2>/dev/null | sed 's/^/- /' || echo "- 未运行"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: server-e2e-evidence
+          path: server/target/e2e/
+
+  web:
+    name: Web · L0 静态检查 + L1 单元测试
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: L0 静态检查（prettier、eslint 类型感知、tsc）
+        run: npm run check
+      - name: L1 单元测试（vitest）
+        run: npm run test:unit | tee "$RUNNER_TEMP/unit.log"
+      - name: 写入总结
+        if: always()
+        run: |
+          {
+            echo "### Web · L1 单元测试"
+            grep -E '^\s+(Test Files|Tests)\s' "$RUNNER_TEMP/unit.log" | sed -E 's/^\s+/- /' || echo "- 未运行"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web-e2e:
+    name: Web · L3 浏览器 E2E（临时环境，Linux 浏览器容器）
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/*.sum
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: L3 浏览器 E2E
+        run: npm run test:e2e -- --reporter=line | tee "$RUNNER_TEMP/e2e.log"
+      - name: 写入总结
+        if: always()
+        run: |
+          {
+            echo "### Web · L3 浏览器 E2E"
+            grep -E '^\s+[0-9]+ (passed|failed|flaky|skipped)' "$RUNNER_TEMP/e2e.log" | sed -E 's/^\s+/- /' || echo "- 未运行"
+            grep -E '^\s+[0-9]+\) \[' "$RUNNER_TEMP/e2e.log" | sed -E 's/^\s+/- 失败：/' || true
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: web-e2e-report
+          path: |
+            web/playwright-report/
+            web/test-results/
+
+  daemon:
+    name: daemon · L0 静态检查 + 公共测试（真实 stdin/stdout）
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: daemon
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: daemon/package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: L0 静态检查（prettier、eslint 类型感知、tsc）
+        run: npm run check
+      - name: 公共测试（构建后经 stdin/stdout 验证协议与生命周期）
+        run: npm test | tee "$RUNNER_TEMP/test.log"
+      - name: 写入总结
+        if: always()
+        run: |
+          {
+            echo "### daemon · 公共测试"
+            grep -E '^ℹ (tests|pass|fail|skipped) ' "$RUNNER_TEMP/test.log" | sed 's/^ℹ /- /' || echo "- 未运行"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  summary:
+    name: 总结
+    # 有 job 失败时仍汇总并报红；整次运行被新推送取消时跳过，避免把取消误报为失败。
+    if: ${{ !cancelled() }}
+    needs: [docs, verification, server, server-integration, web, web-e2e, daemon]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 汇总各层结果
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          {
+            echo "## 验证总结"
+            echo
+            echo "| 检查 | 覆盖层级 | 结果 |"
+            echo "| --- | --- | --- |"
+            echo "$RESULTS" | jq -r '
+              {docs: ["文档链接、工作流与脚本自测", "L0"], verification: ["测试防篡改、先红后绿、变异测试", "测试可信度"], server: ["Server 静态检查与单元测试", "L0 + L1"],
+               "server-integration": ["Server 集成与 E2E", "L2 + L3"], web: ["Web 静态检查与单元测试", "L0 + L1"],
+               "web-e2e": ["Web 浏览器 E2E", "L3"], daemon: ["daemon 静态检查与公共测试", "L0 + 公共测试"]} as $label
+              | to_entries[]
+              | "| \($label[.key][0]) | \($label[.key][1]) | \(if .value.result == "success" then "✅ 通过" elif .value.result == "skipped" then "⏭️ 跳过" elif .value.result == "cancelled" then "⚪ 取消" else "❌ 失败" end) |"'
+            echo
+            echo "未在 CI 运行：L4 真实模型与 E2B（需要凭据，按需手动执行）。"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "$RESULTS" | jq -e 'all(.[]; .result == "success")' > /dev/null

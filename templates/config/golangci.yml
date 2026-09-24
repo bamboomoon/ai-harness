@@ -1,0 +1,76 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - depguard
+    - dupl
+    - errorlint
+    - exhaustive
+    - funlen
+    - gocognit
+    - nilerr
+    - rowserrcheck
+    - sqlclosecheck
+    - unparam
+  settings:
+    depguard:
+      rules:
+        # 数据归属：sqlc 生成代码只由本领域 repo 封装，service 通过 repo 访问数据。
+        generated-in-repo:
+          files:
+            - "**/*.go"
+            - "!**/repo.go"
+            - "!**/*_test.go"
+            # 阶段 5 清理：初始化引导绕过领域 service 直接写库。
+            - "!**/cmd/init/bootstrap.go"
+          deny:
+            - pkg: github.com/bamboomoon/elinter-agent/server/pkg/db/generated
+              desc: 生成代码只在领域 repo.go 中使用，其他代码调用领域 service
+        # 依赖方向指向业务核心：领域包只有 handler、middleware 与请求/响应结构（model.go）接触传输层。
+        domain-without-transport:
+          files:
+            - "**/internal/{admin,auth,modelconfig,provider,user,workspace}/*.go"
+            - "!**/handler.go"
+            - "!**/middleware.go"
+            - "!**/model.go"
+            - "!**/*_test.go"
+          deny:
+            - pkg: github.com/gin-gonic/gin
+              desc: 领域逻辑不依赖 gin，HTTP 细节留在 handler
+            - pkg: github.com/bamboomoon/elinter-agent/server/internal/httpjson
+              desc: 领域逻辑不依赖 HTTP 传输层；由 httpapi 装配时适配领域函数
+        # service 与 repo 不依赖 net/http。
+        core-without-transport:
+          files:
+            - "**/service.go"
+            - "**/repo.go"
+          deny:
+            - pkg: net/http
+              desc: service/repo 不依赖 net/http，HTTP 细节留在 handler
+    exhaustive:
+      default-signifies-exhaustive: true
+    # Clean Code 护栏：拦住明显失控的函数与大段复制，阈值是上限而非目标。
+    gocognit:
+      min-complexity: 20
+  exclusions:
+    # 官方预设：豁免 defer Close 等惯用的忽略错误写法。
+    presets:
+      - std-error-handling
+    rules:
+      # 测试 helper 在调用处写明期望值（如状态码）便于阅读断言，不按恒定参数收敛。
+      - path: _test\.go
+        linters:
+          - unparam
+      # 表格驱动测试天然较长、分支较多，复杂度护栏只约束生产代码。
+      - path: _test\.go
+        linters:
+          - dupl
+          - funlen
+          - gocognit
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

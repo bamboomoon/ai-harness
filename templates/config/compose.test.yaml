@@ -1,0 +1,32 @@
+# 临时测试环境：由 scripts/test-env.sh 以独立 project 启动并销毁，数据只在内存中。
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: elinter
+      POSTGRES_PASSWORD: elinter
+      POSTGRES_DB: elinter
+    ports: ["127.0.0.1::5432"]
+    tmpfs: [/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "elinter", "-d", "elinter"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:8-alpine
+    ports: ["127.0.0.1::6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  # 截图与浏览器 E2E 统一在官方 Linux 镜像中渲染；镜像版本与 web/package.json 的 @playwright/test 保持一致。
+  browser:
+    image: mcr.microsoft.com/playwright:v1.63.0-noble
+    profiles: [browser]
+    init: true
+    user: pwuser
+    working_dir: /home/pwuser
+    command: ["npx", "-y", "playwright@1.63.0", "run-server", "--port", "3000", "--host", "0.0.0.0"]
+    ports: ["127.0.0.1::3000"]

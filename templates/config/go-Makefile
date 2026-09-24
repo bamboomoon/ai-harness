@@ -1,0 +1,33 @@
+# Server 验证入口：check 为 L0 静态检查，test 为 L1 单元测试；integration（L2）与 e2e 在临时环境中运行（见 e2e/README.md）。
+# 工具版本锁定在 tools.mod，不进入生产依赖；以纯 Go 构建，避免依赖本机 cgo 链接器。
+TOOL := CGO_ENABLED=0 go tool -modfile=tools.mod
+
+.PHONY: check lint fmt declorder generate generate-check test integration e2e
+
+check: lint declorder generate-check
+
+lint:
+	$(TOOL) golangci-lint run --build-tags=e2e,integration ./...
+
+fmt:
+	$(TOOL) golangci-lint fmt ./...
+
+declorder:
+	go run ./tools/declorder .
+
+generate:
+	$(TOOL) sqlc generate
+
+generate-check:
+	$(TOOL) sqlc diff
+
+test:
+	go test -count=1 ./...
+
+# 服务与仓库对真实 PostgreSQL 的集成测试，文件以 integration 构建标签隔离。
+integration:
+	../scripts/test-env.sh go -C server test -tags=integration -count=1 ./internal/...
+
+# LABEL 为 Ginkgo 标签表达式，例如 make e2e LABEL=smoke；不含 real-llm 时跳过真实模型场景。
+e2e:
+	../scripts/test-env.sh bash server/e2e/run.sh '$(LABEL)'

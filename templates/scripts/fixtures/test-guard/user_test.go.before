@@ -1,0 +1,2 @@
+func TestKeep(t *testing.T) { t.Fatal(1); t.Fatal(2) }
+func TestGone(t *testing.T) {}

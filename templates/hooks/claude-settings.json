@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.agents/hooks/after-edit.mjs",
+            "timeout": 60,
+            "statusMessage": "格式化并检查刚编辑的文件…"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.agents/hooks/verify-changes.sh",
+            "timeout": 900,
+            "statusMessage": "运行改动模块的检查与测试可信度检查…"
+          }
+        ]
+      }
+    ]
+  }
+}
