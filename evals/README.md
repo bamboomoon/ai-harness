@@ -10,7 +10,7 @@
 | --- | --- |
 | 用例 | [evals.json](evals.json)：每条包含 `skills`、`query`（给 agent 的原话）、`fixture`（起始仓库）、`expected_behavior`（可逐条判定的期望） |
 | 起始仓库 | 每个 `fixture` 对应一个可重复生成的仓库：一段生成脚本（如 `go mod init` / `create-next-app` / Spring Initializr 固定版本）或一个固定提交的副本；需要复现坏样例的，脚本里直接写入坏样例 |
-| 判定 | 能脚本判断的写成检查（文件存在、`diff -r` 与基线一致、hook 配置可解析、`check` 命令通过、故意的违规被拦下）；需要判断力的按 `expected_behavior` 人工或另一个模型逐条打分 |
+| 判定 | 能脚本判断的写成检查（文件存在、CONVENTIONS 中没有模板措辞、hook 配置可解析、`check` 命令通过、故意的违规被拦下）；需要判断力的按 `expected_behavior` 人工或另一个模型逐条打分 |
 | 对照 | 同一用例分别在「无 skill」与「有 skill」下运行，只比较差值；修改 skill 后与上一版结果比较 |
 
 ## 运行方式
@@ -26,6 +26,6 @@
 | 模式 | 用例 | 主要检查 |
 | --- | --- | --- |
 | discover | `discover-stale-readme` | 命令以实际运行为准，发现 README 过时 |
-| init | `init-go-service`、`init-nextjs-app` | 单一 check 入口、故意违规被拦、基线原样复制、CONVENTIONS 与 AGENTS 结构、工具表经用户确认 |
+| init | `init-go-service`、`init-nextjs-app` | 单一 check 入口、故意违规被拦、核心原则与 CONVENTIONS 由模板生成、AGENTS 结构、工具表经用户确认 |
 | adopt | `adopt-java-existing-lint`、`adopt-project-rules-in-skill` | 沿用已有工具、分阶段并由用户确认、项目规则移入 CONVENTIONS |
 | correct | `correct-module-rule`、`correct-generic-style` | 按适用范围落点、修掉坏样例、用当初的错误验证 |

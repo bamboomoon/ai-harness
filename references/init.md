@@ -8,5 +8,5 @@
    完成标准：各层示例一条命令通过。
 3. **验证工具、hook、交付关卡、CI**：按 [verification.md](verification.md) 的目标实现，可参考 [../assets/README.md](../assets/README.md)，命令与路径以本项目为准。
    完成标准：hook 用模拟输入验证一次；CI 首次运行全绿。
-4. **规则与风格**：写根与模块 AGENTS（必读 CONVENTIONS 提示、何时 | 读、用户确认过的工具表、纠正回路及其落点表、测试规则），复制 [../assets/readable/](../assets/readable/) 基线到 `.agents/skills/`，为每个模块建 `CONVENTIONS.md`（见 [style.md](style.md)，先用偏好清单填充），加 PR 模板。
+4. **规则与风格**：写根 AGENTS（必读 CONVENTIONS 提示、何时 | 读、用户确认过的工具表、纠正回路及其落点表、测试规则）与模块 AGENTS（核心原则、何时 | 读、验证入口），以 [../assets/style/](../assets/style/) 模板为起点写模块核心原则并为每个模块建 `CONVENTIONS.md`（见 [style.md](style.md)，先用偏好清单填充），加 PR 模板。
    完成标准：链接检查通过，CONVENTIONS 每条规则都有正例。

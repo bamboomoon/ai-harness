@@ -2,7 +2,7 @@
 
 两类文件：
 
-- `readable/`：风格指南基线，**原样复制**到项目 `.agents/skills/`（见 [../references/style.md](../references/style.md)）。
+- `style/`：各语言写法模板，生成模块 AGENTS 核心原则与 CONVENTIONS 的起点（见 [../references/style.md](../references/style.md)）。
 - 其余文件：参考实现。来自一个 Next.js（web）+ Go（server）+ Node TypeScript（daemon）的多模块仓库，在该仓库的本地与 CI 中实际运行过，用来说明各机制**怎么实现**，不是可以直接复制的模板：模块名、命令、路径、依赖服务、种子数据、错误码约定都属于那个仓库。
 
 使用方式：先读 [../references/verification.md](../references/verification.md) 理解机制的目标，再对照示例看一种实现，最后按 discover 得到的本项目模块、命令与平台重写。示例中与原仓库绑定的部分：
@@ -21,7 +21,8 @@
 | `github/workflows/ci.yml`、`github/pull_request_template.md` | CI 分层与汇总、PR 结构 | job 与命令 |
 | `go/declorder/` | 声明顺序检查与自动归位（go/ast） | 基本通用 |
 | `config/golangci.yml`、`config/go-Makefile`、`config/eslint.*.mjs` | lint 与护栏配置 | 分层规则中的目录与包路径、框架预设 |
-| `conventions/*.CONVENTIONS.md` | 模块项目约定（基线之上的本仓库规则与正反例） | 全部内容 |
+| `conventions/*.CONVENTIONS.md` | 模块 CONVENTIONS（通用规则 + 本仓库写法与正反例） | 全部内容 |
 | `AGENTS.example.md` | 根 AGENTS 的结构（何时读、工具表、纠正回路） | 全部内容 |
+| `module-AGENTS.example.md` | 模块 AGENTS 的结构（核心原则、何时读、验证入口） | 分层、对外契约与验证命令 |
 
 重写完成后，按 [../references/adopt.md](../references/adopt.md) 各阶段的完成标准验证。

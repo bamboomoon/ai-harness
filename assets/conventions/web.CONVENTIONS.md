@@ -1,11 +1,12 @@
 # Web 约定
 
-本仓库在 [readable-typescript](../.agents/skills/readable-typescript/SKILL.md) 之上的具体约定：通用写法看 readable-typescript，本仓库的函数、路径与流程以这里为准。格式、类型感知 lint 与 tsc 由 `npm run check` 检查，不在此重复。
+本模块的写法与正反例：每节先写通用规则，再写本仓库的函数、路径与流程。格式、类型感知 lint 与 tsc 由 `npm run check` 检查，不在此重复。
 
 ## 事件与异步
 
-- 事件处理函数保持同步，异步工作放进 `useAsyncAction`（`src/hooks/use-async-action.ts`，负责防重入与 pending）的 `void run(...)`，失败在回调内 `try/catch` 转成界面状态。
-- 定时器与订阅在 effect 清理中释放，并用测试覆盖清理路径；迟到的响应用 effect 内的 `active` 标记丢弃（见 `models-view.tsx` 的列表查询）。
+- 事件处理函数保持同步，不把 async 函数直接交给 JSX 属性（no-misused-promises）；异步工作放进 `useAsyncAction`（`src/hooks/use-async-action.ts`，负责防重入与 pending）的 `void run(...)`，失败在回调内 `try/catch` 转成界面状态。
+- 定时器、订阅、监听器在创建它的 effect 清理中释放；「立即执行」的路径（清空、取消、卸载）先取消尚未触发的定时器。迟到的响应用 effect 内的 `active` 标记丢弃（见 `models-view.tsx` 的列表查询），不依赖请求顺序。
+- 清理路径用 fake timers 测试：断言卸载或立即执行后旧任务不再触发——只测正常路径时，清理逻辑的变异会全部存活。
 - 读取表单文本字段用 `formText(form, name)`（`src/lib/form-data.ts`）。
 
 ```tsx
@@ -24,11 +25,12 @@ function save(event: FormEvent<HTMLFormElement>) {
 }
 ```
 
-## 外部数据与 API
+## 外部数据与状态
 
+- HTTP 响应、`history.state`、`JSON.parse`、动态 import 等外部数据先当 `unknown`，逐字段收窄后再用，不让 `any` 流入业务判断；`as` 只用于外部库类型不够精确、且依据写在注释里的场合。
 - 请求走 `requestApi`，响应信封类型是 `ApiResponse<T>`（`src/lib/api/api.ts`）；页面组件只调 `src/lib/api/*` 的领域 API。
 - 读取外部状态的正例：`settings-location.ts` 的 `readReturnUrl`（`openSettings` → `readReturnUrl` 也是 Stepdown 的例子）。
-- 互斥的界面状态用可辨识联合，例：`models-view.tsx` 的 `ListState`。
+- 互斥的界面状态用可辨识联合，例：`models-view.tsx` 的 `ListState`；`switch` 覆盖所有分支，有意忽略时写 `default` 并注明原因。可由其他状态推导的值在渲染时计算，不另存一份。
 
 ## 样式
 
@@ -57,5 +59,6 @@ function save(event: FormEvent<HTMLFormElement>) {
 ## 测试
 
 - 组件测试用 `createRoot` + `act`，所有 `act` 都写成 `await act(async () => ...)`；需要翻译时包 `NextIntlClientProvider`。
-- 通过 `apiClient.defaults.adapter` 或 `vi.mock` 控制外部依赖，断言用户可见结果与外发请求（参数、次数）。
+- 通过 `apiClient.defaults.adapter` 或 `vi.mock` 在边界替换外部依赖，断言用户可见结果与外发请求（参数、次数），不断言内部实现。
+- 修 bug 先写在旧实现上失败的测试。
 - 浏览器 E2E 走 `npm run test:e2e`；视觉意图写成 `toHaveCSS` 等明确断言，不做截图比对。

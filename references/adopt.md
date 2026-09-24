@@ -40,13 +40,13 @@
 
 ## 6. 代码风格与示范清理
 
-- 目标：复制 [../assets/readable/](../assets/readable/) 基线，把纠正案例与散落在 AGENTS、skill 中的项目规则收进各模块 `CONVENTIONS.md`（见 [style.md](style.md)）；项目已有 readable 类 skill 时，通用部分对照基线、项目部分移入 CONVENTIONS，能 lint 的进 lint；清理会被模仿的坏样例。
+- 目标：以 [../assets/style/](../assets/style/) 模板为起点，把纠正案例与散落在 AGENTS、skill 中的规则收进各模块 AGENTS 核心原则与 `CONVENTIONS.md`（见 [style.md](style.md)）；项目已有风格类 skill 时，把内容按同样方式并入后删除该 skill，能 lint 的进 lint；清理会被模仿的坏样例。
 - 做法：清理交给能力较低的模型只依据风格指南与 AGENTS 执行，审 diff 并独立复跑交付关卡——既清理代码，也检验规则是否写清。
-- 完成标准：规则、示范代码与 lint 三者一致；`.agents/skills/readable-*` 不含本仓库路径。
+- 完成标准：规则、示范代码与 lint 三者一致；风格内容只在模块 AGENTS 核心原则与 CONVENTIONS 中各有一处。
 
 ## 7. 规则与文档
 
-- 按 [docs.md](docs.md) 重写根与模块 AGENTS（含必读 CONVENTIONS 提示、纠正落点表，以及按 discover 中用户确认的清单写的工具表），拆分端到端测试的运行文档与编写指南，归档过程文档。
+- 按 [docs.md](docs.md) 重写根与模块 AGENTS（根 AGENTS 含必读 CONVENTIONS 提示、纠正落点表与用户确认过的工具表；模块 AGENTS 含核心原则），拆分端到端测试的运行文档与编写指南，归档过程文档。
 - 完成标准：每个 AGENTS 只剩路由、推断不出的规则与验证入口；链接检查通过。
 
 ## 8. 对照实验

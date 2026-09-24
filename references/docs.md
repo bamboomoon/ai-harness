@@ -4,20 +4,20 @@
 
 - 读者是 agent。每一行在每个回合都占上下文，只写**推断不出**的内容：约定、理由、坑。
 - 文档引用写成「何时 | 读」表：首列是触发条件（agent 按手头任务匹配），一行一个分支；同义改写合并为一行。
-- 删 no-op：模型默认就会遵守的话（泛泛的 Clean Code、Clean Architecture 转述）。原则放进 readable 的引导词，依赖方向放进 lint。
+- 删 no-op：模型默认就会遵守的话（泛泛的 Clean Code、Clean Architecture 转述）。原则写成模块 AGENTS 核心原则的引导词，依赖方向放进 lint。
 - 删环境缓存：`package.json` 脚本清单、配置文件内容、目录列表——agent 自己查得到，写在文档里只会过时。
 - 正向表述目标行为；禁止句只用于无法正向表述的硬护栏，并配上应该怎么做。
 - 进入子目录时 Claude Code 与 Codex 都会加载该目录的 AGENTS.md/CLAUDE.md，根文件不必逐一路由到模块，只保留「跨多个模块」一行。
-- 模块 AGENTS 只放路由与验证入口；本模块的规则写进同目录 `CONVENTIONS.md`（见 [style.md](style.md)），「何时读」首行「写、改或审查本模块代码（必读）」指向它。必守规则不依赖「先加载某个 skill」——实验中约一半的 agent 没有加载 skill；引用 skill 时给仓库相对路径，并注明 Skill 工具不可用时直接读文件。
+- 模块 AGENTS 写三样：**核心原则**、路由（「何时读」首行「写、改或审查本模块代码（必读）」指向同目录 `CONVENTIONS.md`）与验证入口；本模块的具体写法写进 CONVENTIONS（见 [style.md](style.md)）。核心原则是经典引导词各一行（单一抽象层级、Stepdown、SRP、DRY、YAGNI、迪米特、CQS、意图命名）、一行本语言要点，加跨语言约定（框架优先、注释只写 why、删除优于兼容），其中 SRP 写成本模块的分层、兼容策略写明本模块的对外契约；每个模块一份，根 AGENTS 不写，单模块仓库的根 AGENTS 就是模块 AGENTS。必守规则不依赖「先加载某个 skill」——实验中约一半的 agent 没有加载 skill；确需引用 skill 时给仓库相对路径，并注明 Skill 工具不可用时直接读文件。
 - 根 AGENTS 用「工具」表（何时 | 用）列出 agent **在本项目写代码时**应该用的 skill、MCP 与 CLI：每行写触发场景、各 agent 下的名字、不可用时的退路。条目来自 discover 中**用户确认过**的工具清单，agent 不自行增删。入选须同时满足：
   - 编码任务中会用到：建立或修改 agent 机制本身的 skill（如本 skill）、人用的工作区/桌面工具不算；
   - agent 默认想不到或会用错：语言工具链与包管理器（npm、go、mvn）、只经项目脚本间接使用的工具（Docker）、agent 会自行选用的通用 skill（审查、排错、TDD、写文档）不写——项目强制要求的用法写进对应规则（如交付前审查写进「测试与验证」）；
   - 现在就能用：需要先建索引、先登录或只在个别机器上才有的，建好后再加，或注明「本地已配置时」并给退路。
-  典型入选：项目随仓库提供的 skill（readable 基线）、项目代码托管与 CI 的 CLI（gh、glab）、组件库 CLI（shadcn）、已建索引的代码检索（CodeGraph）、前端项目的浏览器核对 MCP。
-- 必读提示：根 AGENTS（始终加载）开头写一句「写、改或审查任何模块的代码之前，先完整阅读该模块的 `CONVENTIONS.md`」并要求交付说明列出读过的 CONVENTIONS；模块 AGENTS 开头重复一行加粗提示。纠正回路下附「适用范围 → 写到哪里」表（模块 CONVENTIONS / 根 AGENTS / readable 基线）。
+  典型入选：项目随仓库提供的 skill、项目代码托管与 CI 的 CLI（gh、glab）、组件库 CLI（shadcn）、已建索引的代码检索（CodeGraph）、前端项目的浏览器核对 MCP。
+- 必读提示：根 AGENTS（始终加载）开头写一句「写、改或审查任何模块的代码之前，先完整阅读该模块的 `CONVENTIONS.md`」并要求交付说明列出读过的 CONVENTIONS；模块 AGENTS 开头重复一行加粗提示。纠正回路下附「适用范围 → 写到哪里」表（模块 CONVENTIONS / 各模块 AGENTS 核心原则 / 根 AGENTS）。
 - `CLAUDE.md` 用软链接指向 `AGENTS.md`，两种工具读同一份。
 
-根 AGENTS 建议包含：一句话模块地图、何时 | 读、工具（何时 | 用）、纠正回路、测试层级与三条测试规则（最低可观察层、修 bug 先红、存储交给 L2）、hook 与交付关卡、交付说明（指向 PR 模板）、少量约定。
+根 AGENTS 建议包含：一句话模块地图、何时 | 读、工具（何时 | 用）、纠正回路、测试层级与三条测试规则（最低可观察层、修 bug 先红、存储交给 L2）、hook 与交付关卡、交付说明（指向 PR 模板）；只放跨模块的流程，编码原则与约定放各模块 AGENTS。
 
 ## 文档分工（按寿命，而不是按类型）
 

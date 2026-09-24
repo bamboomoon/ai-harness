@@ -21,7 +21,7 @@
     "expected_behavior": [
       "向用户确认使用的 agent、纠正案例与工具清单后再动手，而不是自行决定",
       "提供单一 check 入口（格式、lint、类型），故意写一个 handler 直接导入数据库包的违规会被 check 拦下",
-      "`.agents/skills/readable-go/` 与 skill 的 assets/readable/readable-go 逐字一致",
+      "server 模块 AGENTS 含核心原则（含 Go 要点）；CONVENTIONS 由 assets/style/go.md 生成，没有模板措辞，每条规则有本仓库正例",
       "模块规则写在 CONVENTIONS.md，纠正「handler 不写 SQL」落在 lint（depguard）或 CONVENTIONS，并说明选择理由",
       "根 AGENTS 含必读 CONVENTIONS 提示、工具表只有 gh、纠正回路及落点表",
       "Claude Code 与 Codex 的 hook 都已注册，并用模拟输入验证过触发",
@@ -37,7 +37,7 @@
     "expected_behavior": [
       "启用 typescript-eslint 类型感知规则，`onClick={async () => ...}` 被 no-misused-promises 拦下",
       "用户说不能用 Docker 时，端到端测试不依赖容器，并在报告中说明替代方案与代价",
-      "`.agents/skills/readable-typescript/` 与基线逐字一致；web 的项目约定写在 CONVENTIONS.md",
+      "模块 AGENTS 含核心原则（含 TypeScript 要点）；写法与正反例写在 CONVENTIONS.md，没有另建风格 skill",
       "工具表只有 shadcn CLI 与浏览器 MCP，浏览器 MCP 注明本地已配置时",
       "没有为不存在的层（如 L2 集成）建空骨架"
     ]
@@ -59,13 +59,13 @@
   {
     "id": "adopt-project-rules-in-skill",
     "skills": ["agent-harness"],
-    "fixture": "Go 仓库：`.agents/skills/readable-go/SKILL.md` 混有本仓库路径与错误码约定，模块 AGENTS 有一段必守规则",
+    "fixture": "Go 仓库：有一个项目级风格 skill `.agents/skills/go-style/`，混有通用原则与本仓库路径、错误码约定；模块 AGENTS 有一段必守规则",
     "query": "用 agent-harness 整理一下这个仓库的规则文档。",
     "user_answers": {"agents": "Claude Code", "corrections": "无", "tools": "gh CLI"},
     "expected_behavior": [
-      "把 readable-go 中提到本仓库类型、路径、错误码的内容移入模块 CONVENTIONS.md，readable-go 换回基线",
+      "通用原则并入模块 AGENTS 核心原则，写法与本仓库约定并入模块 CONVENTIONS.md，然后删除该 skill",
       "模块 AGENTS 只剩路由与验证入口，首行必读指向 CONVENTIONS",
-      "没有丢失任何原有规则：每条旧规则都能在 CONVENTIONS、lint 或基线中找到",
+      "没有丢失任何原有规则：每条旧规则都能在核心原则、CONVENTIONS 或 lint 中找到",
       "链接检查通过"
     ]
   },
@@ -78,7 +78,7 @@
     "expected_behavior": [
       "复述成可判断对错的规则，并给出正例与反例",
       "找到根因：仓库里的坏样例",
-      "修掉坏样例，规则写进该模块 CONVENTIONS.md（配本仓库正例、反例注明来源），而不是改 readable-go 基线",
+      "修掉坏样例，规则写进该模块 CONVENTIONS.md（配本仓库正例、反例注明来源），而不是写进核心原则或模板",
       "说明落在哪一层，并用当初的错误验证会被拦下或被引导到正确写法"
     ]
   },
@@ -89,8 +89,8 @@
     "query": "以后互斥的状态用可辨识联合，不要用一堆可选字段拼。",
     "user_answers": {},
     "expected_behavior": [
-      "判断这条规则换一个 TypeScript 项目仍成立，落点是 readable 基线而不是本仓库 CONVENTIONS",
-      "提示需要在 agent-harness 仓库修改基线后再同步到项目，而不是只改项目内副本",
+      "写进该模块 CONVENTIONS 的状态主题，配本仓库的正例与反例",
+      "判断这是多个 TypeScript 项目都需要的写法，提示可同时更新 agent-harness 的 assets/style/typescript.md",
       "若能写成 lint（如 switch-exhaustiveness-check）则优先 lint"
     ]
   }
