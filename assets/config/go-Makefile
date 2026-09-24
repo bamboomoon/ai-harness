@@ -24,9 +24,10 @@ generate-check:
 test:
 	go test -count=1 ./...
 
-# 服务与仓库对真实 PostgreSQL 的集成测试，文件以 integration 构建标签隔离。
+# 服务与仓库对真实 PostgreSQL 的集成测试，文件以 integration 构建标签隔离；PKGS 可缩小到指定包（交付关卡用）。
+PKGS ?= ./internal/...
 integration:
-	../scripts/test-env.sh go -C server test -tags=integration -count=1 ./internal/...
+	../scripts/test-env.sh go -C server test -tags=integration -count=1 $(PKGS)
 
 # LABEL 为 Ginkgo 标签表达式，例如 make e2e LABEL=smoke；不含 real-llm 时跳过真实模型场景。
 e2e:

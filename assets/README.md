@@ -10,7 +10,7 @@
 | 文件 | 示例展示的机制 | 与原仓库绑定、需按项目重写的部分 |
 | --- | --- | --- |
 | `scripts/test-env.sh`、`config/compose.test.yaml` | 一次性测试环境 | 依赖服务、迁移与种子命令、导出的变量 |
-| `scripts/verify-delivery.sh` | 交付关卡与改动指纹 | 模块判断与各模块的 L2/L3 命令 |
+| `scripts/verify-delivery.sh` | 交付关卡与改动指纹 | 模块判断、各模块的 L2/L3 命令与 E2E 标签过滤写法 |
 | `scripts/test-guard.mjs`（含自测与 fixtures） | 防篡改检查 | 测试与快照文件的路径模式、语言写法模式 |
 | `scripts/red-green.mjs` | 先红后绿 | 各模块测试路径与运行方式 |
 | `scripts/mutation.mjs` | 改动行变异测试 | 源码范围与变异工具 |
