@@ -7,16 +7,16 @@ description: "Use when setting up or improving how AI agents code in a repositor
 
 让 agent 每次走同一套过程：写代码时有具体规则可循，写完有机器验证，交付前有证据。
 
-本 skill 描述**每个机制要达到的目标、判断依据与完成标准**；项目的模块、命令、工具与平台一律从项目中探索并实际运行确认（见 [modes/discover.md](modes/discover.md)），不照搬任何示例。文中「例」均来自一个 Next.js + Go + Node 的多模块仓库，只用于说明机制。
+本 skill 描述**每个机制要达到的目标、判断依据与完成标准**；项目的模块、命令、工具与平台一律从项目中探索并实际运行确认（见 [references/discover.md](references/discover.md)），不照搬任何示例。文中「例」均来自一个 Next.js + Go + Node 的多模块仓库，只用于说明机制。
 
 ## 选模式
 
 | 情况 | 读 |
 | --- | --- |
-| 开始任何模式之前 | [modes/discover.md](modes/discover.md) |
-| 空仓库或刚初始化的项目 | [modes/init.md](modes/init.md) |
-| 已有代码的项目，引入或补齐机制 | [modes/adopt.md](modes/adopt.md) |
-| 用户纠正了 agent 的代码或做法 | [modes/correct.md](modes/correct.md) |
+| 开始任何模式之前 | [references/discover.md](references/discover.md) |
+| 空仓库或刚初始化的项目 | [references/init.md](references/init.md) |
+| 已有代码的项目，引入或补齐机制 | [references/adopt.md](references/adopt.md) |
+| 用户纠正了 agent 的代码或做法 | [references/correct.md](references/correct.md) |
 
 ## 共通概念
 
@@ -30,8 +30,8 @@ description: "Use when setting up or improving how AI agents code in a repositor
 
 | 何时 | 读 |
 | --- | --- |
-| 写或重排 AGENTS.md、模块文档、归档 | [reference/docs.md](reference/docs.md) |
-| 设计测试分层、测试环境、验证工具、hook、交付关卡、CI | [reference/verification.md](reference/verification.md) |
-| 为某个技术栈挑选工具 | [reference/stacks/go.md](reference/stacks/go.md)、[typescript.md](reference/stacks/typescript.md)、[java.md](reference/stacks/java.md) |
-| 写风格指南（基线在 [readable/](readable/)）或模块 CONVENTIONS | [reference/style.md](reference/style.md) |
-| 需要一个参考实现来理解某个机制 | [examples/README.md](examples/README.md) |
+| 写或重排 AGENTS.md、模块文档、归档 | [references/docs.md](references/docs.md) |
+| 设计测试分层、测试环境、验证工具、hook、交付关卡、CI | [references/verification.md](references/verification.md) |
+| 为某个技术栈挑选工具 | [references/stack-go.md](references/stack-go.md)、[references/stack-typescript.md](references/stack-typescript.md)、[references/stack-java.md](references/stack-java.md) |
+| 写风格指南（基线在 [assets/readable/](assets/readable/)）或模块 CONVENTIONS | [references/style.md](references/style.md) |
+| 需要一个参考实现来理解某个机制 | [assets/README.md](assets/README.md) |

@@ -4,12 +4,12 @@
 
 ## 通用基线与项目约定分开
 
-- **风格指南（通用）**：[../readable/](../readable/) 的基线——`readable-code`（跨语言，其他语言的兜底）、`readable-go`、`readable-typescript`、`readable-java`。原样复制到项目 `.agents/skills/`，不写本仓库路径；需要调整通用写法时回到 agent-harness 修改后再同步，项目间保持一致。
+- **风格指南（通用）**：[../assets/readable/](../assets/readable/) 的基线——`readable-code`（跨语言，其他语言的兜底）、`readable-go`、`readable-typescript`、`readable-java`。原样复制到项目 `.agents/skills/`，不写本仓库路径；需要调整通用写法时回到 agent-harness 修改后再同步，项目间保持一致。
 - **项目约定（本仓库）**：每个模块一份 `CONVENTIONS.md`，写基线之上本仓库特有的规则——具体类型、函数、路径、错误码、流程，每条配本仓库正例（`文件` 的 `函数`），反例注明来源（哪次纠正）。模块 AGENTS 的「何时读」首行指向它。
 
 判断一条内容放哪：换一个同技术栈的项目仍然成立 → 基线；提到本仓库的名字或只在本仓库成立 → CONVENTIONS。
 
-完成标准：`.agents/skills/readable-*` 与基线一致；CONVENTIONS 每条规则都能在仓库里找到正例。参考 [../examples/conventions/](../examples/conventions/)。
+完成标准：`.agents/skills/readable-*` 与基线一致；CONVENTIONS 每条规则都能在仓库里找到正例。参考 [../assets/conventions/](../assets/conventions/)。
 
 ## 结构
 

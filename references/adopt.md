@@ -13,7 +13,7 @@
 ## 2. 静态检查（L0）
 
 - 目标：每个模块一个 `check` 入口（格式、lint、类型、生成代码一致性），本地与 CI 同一条命令，工具版本锁在仓库内。
-- 决策点：沿用项目已有的 lint 与格式化工具，只补缺失项；依赖方向能写成 lint 的写成 lint；Clean Code 护栏（复杂度、函数长度、重复）只约束生产代码，阈值作上限。候选工具见 [../reference/stacks/](../reference/stacks/)。
+- 决策点：沿用项目已有的 lint 与格式化工具，只补缺失项；依赖方向能写成 lint 的写成 lint；Clean Code 护栏（复杂度、函数长度、重复）只约束生产代码，阈值作上限。候选工具见 [stack-go.md](stack-go.md)、[stack-typescript.md](stack-typescript.md)、[stack-java.md](stack-java.md)。
 - 先修存量再开启门禁；存量过大时先按目录或规则分批开启，并记录剩余范围。
 - 完成标准：各模块 `check` 通过，拿一个故意的违规验证会被拦下。
 
@@ -28,7 +28,7 @@
 
 ## 4. 测试可信度工具
 
-- 目标：发现被削弱的测试、没测到改动的测试、强度不够的测试（见 [../reference/verification.md](../reference/verification.md)）。
+- 目标：发现被削弱的测试、没测到改动的测试、强度不够的测试（见 [verification.md](verification.md)）。
 - 决策点：防篡改检查几乎总是值得；先红后绿需要能在基准版本上运行改动的测试；变异测试在单元测试已有一定规模时才有意义，先对改动行、只出报告。
 - 完成标准：每个工具在已知正例与反例上判定正确（可用阶段 1 的基线工作区验证）。
 
@@ -40,13 +40,13 @@
 
 ## 6. 代码风格与示范清理
 
-- 目标：复制 [../readable/](../readable/) 基线，把纠正案例与散落在 AGENTS、skill 中的项目规则收进各模块 `CONVENTIONS.md`（见 [../reference/style.md](../reference/style.md)）；项目已有 readable 类 skill 时，通用部分对照基线、项目部分移入 CONVENTIONS，能 lint 的进 lint；清理会被模仿的坏样例。
+- 目标：复制 [../assets/readable/](../assets/readable/) 基线，把纠正案例与散落在 AGENTS、skill 中的项目规则收进各模块 `CONVENTIONS.md`（见 [style.md](style.md)）；项目已有 readable 类 skill 时，通用部分对照基线、项目部分移入 CONVENTIONS，能 lint 的进 lint；清理会被模仿的坏样例。
 - 做法：清理交给能力较低的模型只依据风格指南与 AGENTS 执行，审 diff 并独立复跑交付关卡——既清理代码，也检验规则是否写清。
 - 完成标准：规则、示范代码与 lint 三者一致；`.agents/skills/readable-*` 不含本仓库路径。
 
 ## 7. 规则与文档
 
-- 按 [../reference/docs.md](../reference/docs.md) 重写根与模块 AGENTS（含必读 CONVENTIONS 提示、纠正落点表，以及按 discover 中用户确认的清单写的工具表），拆分端到端测试的运行文档与编写指南，归档过程文档。
+- 按 [docs.md](docs.md) 重写根与模块 AGENTS（含必读 CONVENTIONS 提示、纠正落点表，以及按 discover 中用户确认的清单写的工具表），拆分端到端测试的运行文档与编写指南，归档过程文档。
 - 完成标准：每个 AGENTS 只剩路由、推断不出的规则与验证入口；链接检查通过。
 
 ## 8. 对照实验
