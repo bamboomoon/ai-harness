@@ -40,7 +40,7 @@
 
 ## 6. 代码风格与示范清理
 
-- 目标：把纠正案例变成项目级风格指南（见 [../reference/style.md](../reference/style.md)），必守项进模块 AGENTS 或 lint；清理会被模仿的坏样例。
+- 目标：从 [../readable/](../readable/) 基线出发，把纠正案例变成项目级风格指南（见 [../reference/style.md](../reference/style.md)）；项目已有 readable 类 skill 时在其上补齐，必守项进模块 AGENTS 或 lint；清理会被模仿的坏样例。
 - 做法：清理交给能力较低的模型只依据风格指南与 AGENTS 执行，审 diff 并独立复跑交付关卡——既清理代码，也检验规则是否写清。
 - 完成标准：规则、示范代码与 lint 三者一致。
 

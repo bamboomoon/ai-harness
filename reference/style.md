@@ -2,11 +2,22 @@
 
 原则本身不改变模型的行为——模型早已熟悉 Clean Code。改变行为的是：经典术语作引导词、本仓库的正反例、lint 与独立审查。
 
+## 基线与项目化
+
+[../readable/](../readable/) 提供与项目无关的基线：`readable-code`（跨语言原则，其他语言的兜底）、`readable-go`、`readable-typescript`、`readable-java`。它们本身就是可安装的 skill，未项目化也能用。
+
+项目化：把对应语言的基线复制到项目 `.agents/skills/readable-<lang>/`，然后
+1. description 与标题注明「本仓库」，把目标句中的「项目检查命令」换成实际命令；
+2. 每条引导词后补一个本仓库的正例（`文件` 的 `函数`），找不到正例的先改代码或暂缓这条；
+3. 基线中的通用写法（「项目统一的错误类型」「回调式事务 helper」）换成本仓库实际的类型、函数与路径；项目没有的主题删掉，项目特有的主题（按纠正案例）新增文件并加进「何时读」；
+4. 与本仓库现有代码冲突的条目按下方「维护」处理。
+
+完成标准：SKILL.md 里没有「项目的」「如」这类占位措辞；每条规则都能在仓库里找到正例。参考 [../examples/readable/](../examples/readable/)（一个 Go + TS 仓库的项目化结果）。
+
 ## 结构
 
-每种语言一个项目级 skill（如 `.agents/skills/readable-go/`）：
 - `SKILL.md` 核心（≤ 约 60 行，每次都读）：目标一句话；Clean Code 引导词各一行并配本仓库例子；「何时读」表指向主题文件。
-- 主题文件（≤ 约 80 行，仅相关分支加载）：如 validation、data-access、errors、testing、concurrency（Go）；external-data、events-async、state、testing（TS）。
+- 主题文件（≤ 约 80 行，仅相关分支加载）：按主题拆分，相关分支才加载。
 
 ## 引导词（跨语言）
 

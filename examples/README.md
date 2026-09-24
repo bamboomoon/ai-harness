@@ -17,6 +17,7 @@
 | `github/workflows/ci.yml`、`github/pull_request_template.md` | CI 分层与汇总、PR 结构 | job 与命令 |
 | `go/declorder/` | 声明顺序检查与自动归位（go/ast） | 基本通用 |
 | `config/golangci.yml`、`config/go-Makefile`、`config/eslint.*.mjs` | lint 与护栏配置 | 分层规则中的目录与包路径、框架预设 |
+| `readable/readable-go/`、`readable/readable-typescript/` | 项目化后的风格指南（引导词配本仓库例子、项目特有主题） | 全部例子、路径与约定 |
 | `AGENTS.example.md` | 根 AGENTS 的结构 | 全部内容 |
 
 重写完成后，按 [../modes/adopt.md](../modes/adopt.md) 各阶段的完成标准验证。

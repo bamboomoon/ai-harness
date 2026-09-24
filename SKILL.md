@@ -33,5 +33,5 @@ description: "Use when setting up or improving how AI agents code in a repositor
 | 写或重排 AGENTS.md、模块文档、归档 | [reference/docs.md](reference/docs.md) |
 | 设计测试分层、测试环境、验证工具、hook、交付关卡、CI | [reference/verification.md](reference/verification.md) |
 | 为某个技术栈挑选工具 | [reference/stacks/go.md](reference/stacks/go.md)、[typescript.md](reference/stacks/typescript.md)、[java.md](reference/stacks/java.md) |
-| 写项目级风格指南 | [reference/style.md](reference/style.md) |
+| 写项目级风格指南（基线在 [readable/](readable/)） | [reference/style.md](reference/style.md) |
 | 需要一个参考实现来理解某个机制 | [examples/README.md](examples/README.md) |
