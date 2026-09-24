@@ -46,7 +46,7 @@
 
 1. 编辑时（hook 自动）：编辑模块代码前核对本会话是否读过该模块 CONVENTIONS，没读则拒绝这次编辑；编辑后格式化并修复该文件。
 2. 回合结束（hook 自动）：对改动模块运行 check 与单元测试、测试防篡改与先红后绿检查，失败或出现新的待审项会退回。
-3. 交付前：在仓库根目录运行 `scripts/verify-delivery.sh`（受影响模块的 L2/L3 与改动行变异测试），再对 diff 做一次独立审查（Claude Code 用 `code-review`，Codex 用 `/review`，标准为模块 AGENTS 的核心原则与 CONVENTIONS）。阶段性汇报或提问的回合写明「未交付」。
+3. 交付前：在仓库根目录运行 `scripts/verify-delivery.sh <领域...>`（受影响包的 L2、smoke 与所传领域标签的 L3、改动文件的变异测试；领域取本次改动涉及的 E2E 标签，新增或修改的 E2E 用例必须带上所传标签之一；全量 E2E 由 CI 运行），再对 diff 做一次独立审查（Claude Code 用 `code-review`，Codex 用 `/review`，标准为模块 AGENTS 的核心原则与 CONVENTIONS）。阶段性汇报或提问的回合写明「未交付」。
 4. 汇报：结论以本次实际执行为准，按层分别报告通过、失败、跳过与未运行；环境阻塞不算完成。
 
 ## 交付说明

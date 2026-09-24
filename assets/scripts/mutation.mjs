@@ -5,7 +5,7 @@
 // 范围：server 业务包（不含 cmd 入口、生成代码、测试与测试基础设施 internal/testdb）用 gremlins；web/src（不含 shadcn 原样组件）用 Stryker；
 // daemon 使用 node:test，Stryker 暂无对应运行器，不纳入。
 import { execFileSync, spawnSync } from 'node:child_process';
-import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, relative } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -60,6 +60,12 @@ function mutateServer(files) {
   const integration = process.env.DATABASE_URL ? ['--tags', 'integration'] : [];
   for (const pkg of new Set(files.map((path) => dirname(path)))) {
     const out = join(mkdtempSync(join(tmpdir(), 'gremlins-')), 'result.json');
+    // gremlins 会递归变异包目录下所有文件（路径相对包目录）：排除子目录与本包未改动的文件，只变异改动文件。
+    const untouched = readdirSync(pkg).filter(
+      (name) => name.endsWith('.go') && !name.endsWith('_test.go') && !files.includes(join(pkg, name)),
+    );
+    const exclude = ['-E', '/'];
+    if (untouched.length) exclude.push('-E', `^(${untouched.map((name) => name.replaceAll('.', '\\.')).join('|')})$`);
     // 每个变异都要重新编译，覆盖率运行耗时乘以默认系数常不足以完成，放宽避免误判为超时；
     // 业务规则多为布尔条件，额外启用默认关闭的 && / || 互换变异。
     spawnSync(
@@ -74,6 +80,7 @@ function mutateServer(files) {
         '20',
         '--invert-logical',
         ...integration,
+        ...exclude,
         '-o',
         out,
         `./${relative('server', pkg)}`,

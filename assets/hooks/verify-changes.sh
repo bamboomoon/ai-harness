@@ -73,6 +73,6 @@ fi
 if [[ ${#modules[@]} -gt 0 ]]; then
   current="$(scripts/verify-delivery.sh --fingerprint)"
   if [[ "$(cat "$state_dir/delivery-verified" 2>/dev/null)" != "$current" ]]; then
-    remind_once delivery-reminded "$current" "交付前需运行 scripts/verify-delivery.sh（受影响模块的集成测试、E2E 与改动行变异测试），通过后再交付；若本回合只是阶段性汇报或提问，请在回复中明确说明「未交付，尚未运行交付关卡」。"
+    remind_once delivery-reminded "$current" "交付前需运行 scripts/verify-delivery.sh <本次改动涉及的 E2E 领域标签>（受影响包的集成测试、smoke 与所传领域的 E2E、改动文件的变异测试），通过后再交付；若本回合只是阶段性汇报或提问，请在回复中明确说明「未交付，尚未运行交付关卡」。"
   fi
 fi
