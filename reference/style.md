@@ -2,22 +2,19 @@
 
 原则本身不改变模型的行为——模型早已熟悉 Clean Code。改变行为的是：经典术语作引导词、本仓库的正反例、lint 与独立审查。
 
-## 基线与项目化
+## 通用基线与项目约定分开
 
-[../readable/](../readable/) 提供与项目无关的基线：`readable-code`（跨语言原则，其他语言的兜底）、`readable-go`、`readable-typescript`、`readable-java`。它们本身就是可安装的 skill，未项目化也能用。
+- **风格指南（通用）**：[../readable/](../readable/) 的基线——`readable-code`（跨语言，其他语言的兜底）、`readable-go`、`readable-typescript`、`readable-java`。原样复制到项目 `.agents/skills/`，不写本仓库路径；需要调整通用写法时回到 agent-harness 修改后再同步，项目间保持一致。
+- **项目约定（本仓库）**：每个模块一份 `CONVENTIONS.md`，写基线之上本仓库特有的规则——具体类型、函数、路径、错误码、流程，每条配本仓库正例（`文件` 的 `函数`），反例注明来源（哪次纠正）。模块 AGENTS 的「何时读」首行指向它。
 
-项目化：把对应语言的基线复制到项目 `.agents/skills/readable-<lang>/`，然后
-1. description 与标题注明「本仓库」，把目标句中的「项目检查命令」换成实际命令；
-2. 每条引导词后补一个本仓库的正例（`文件` 的 `函数`），找不到正例的先改代码或暂缓这条；
-3. 基线中的通用写法（「项目统一的错误类型」「回调式事务 helper」）换成本仓库实际的类型、函数与路径；项目没有的主题删掉，项目特有的主题（按纠正案例）新增文件并加进「何时读」；
-4. 与本仓库现有代码冲突的条目按下方「维护」处理。
+判断一条内容放哪：换一个同技术栈的项目仍然成立 → 基线；提到本仓库的名字或只在本仓库成立 → CONVENTIONS。
 
-完成标准：SKILL.md 里没有「项目的」「如」这类占位措辞；每条规则都能在仓库里找到正例。参考 [../examples/readable/](../examples/readable/)（一个 Go + TS 仓库的项目化结果）。
+完成标准：`.agents/skills/readable-*` 与基线一致；CONVENTIONS 每条规则都能在仓库里找到正例。参考 [../examples/conventions/](../examples/conventions/)。
 
 ## 结构
 
-- `SKILL.md` 核心（≤ 约 60 行，每次都读）：目标一句话；Clean Code 引导词各一行并配本仓库例子；「何时读」表指向主题文件。
-- 主题文件（≤ 约 80 行，仅相关分支加载）：按主题拆分，相关分支才加载。
+- 基线 `SKILL.md` 核心（≤ 约 60 行，每次都读）：目标一句话；Clean Code 引导词各一行；「何时读」表指向主题文件。主题文件（≤ 约 80 行）按主题拆分，相关分支才加载。
+- `CONVENTIONS.md` 按主题分节（与基线主题对应，另加项目特有主题如设计稿、UI 组件），总长超过约 150 行时按主题拆到模块 `docs/conventions/`，CONVENTIONS 保留索引。
 
 ## 引导词（跨语言）
 
@@ -32,6 +29,6 @@
 
 - 每条规则配本仓库正例，注明来源（哪次纠正或实验）；能 lint 的写成 lint 后删除规则。
 - 规则与现有代码冲突时，先改代码或暂不写规则——agent 跟随代码而不是规则。
-- 必守项同时写进模块 AGENTS（agent 不一定加载 skill）。
+- 必守项写进 CONVENTIONS 而不是只写进 skill（实验中约一半 agent 没有加载 skill）；AGENTS 指向它的那一行写清触发条件并标「必读」。
 - 交付前独立审查（Claude Code `code-review`、Codex `/review`）以核心原则与模块 AGENTS 为标准。
 - 定期对规则做删除测试：去掉后行为不变的是 no-op，删除。

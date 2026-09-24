@@ -2,15 +2,27 @@
 
 仓库由 web（Next.js 页面与交互）、server（Go 业务后端）、daemon（Pi 执行进程）组成。进入模块目录工作时，该模块的 AGENTS.md 会自动加载；这里只放跨模块的规则。
 
+**写、改或审查任何模块的代码之前，先完整阅读该模块的 `CONVENTIONS.md`**（`server/`、`web/`、`daemon/` 各一份）。它是本模块规则的唯一来源，没读就动手的改动按未遵守约定处理；交付说明里列出本次读过的 CONVENTIONS。
+
 ## 何时读
 
-| 何时 | 读 |
-| --- | --- |
-| 命名业务概念，写 issue、规格或测试描述 | [CONTEXT.md](CONTEXT.md) |
-| 改动触及已记录的设计取舍 | [docs/adr/](docs/adr/) |
-| 处理 issue、规格或分诊 | [issue tracker](docs/agents/issue-tracker.md)、[分诊标签](docs/agents/triage-labels.md) |
-| 一次改动跨多个模块 | 每个受影响模块的 AGENTS.md |
-| 新增或修改 E2E 场景 | [server E2E 编写指南](server/e2e/WRITING.md)、[web E2E 编写指南](web/tests/e2e/WRITING.md) |
+| 何时                                   | 读                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 命名业务概念，写 issue、规格或测试描述 | [CONTEXT.md](CONTEXT.md)                                                                   |
+| 改动触及已记录的设计取舍               | [docs/adr/](docs/adr/)                                                                     |
+| 处理 issue、规格或分诊                 | [issue tracker](docs/agents/issue-tracker.md)、[分诊标签](docs/agents/triage-labels.md)    |
+| 一次改动跨多个模块                     | 每个受影响模块的 AGENTS.md                                                                 |
+| 新增或修改 E2E 场景                    | [server E2E 编写指南](server/e2e/WRITING.md)、[web E2E 编写指南](web/tests/e2e/WRITING.md) |
+
+## 工具
+
+| 何时                             | 用                                                                                                                         |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 定位代码、理解调用关系与影响范围 | CodeGraph：MCP `codegraph_explore`，或 `codegraph explore "<符号或问题>"`（本地有 `.codegraph/` 索引时；否则用搜索与阅读） |
+| 写、改或审查 Go / TypeScript     | skill `readable-go` / `readable-typescript`（[.agents/skills/](.agents/skills/)，Skill 工具不可用时直接读取）              |
+| 需求、issue、PR 与 CI 结果       | `gh` CLI（见 [issue tracker](docs/agents/issue-tracker.md)）                                                               |
+| 查询、安装、更新 UI 组件         | shadcn CLI（见 [web 约定](web/CONVENTIONS.md#ui-组件)）                                                                    |
+| 在浏览器里核对界面行为           | 浏览器 MCP（Claude Code：claude-in-chrome；Codex：chrome-devtools），本地已配置时；结论仍以 E2E 断言为准                   |
 
 ## 纠正回路
 
@@ -18,24 +30,32 @@
 
 1. **代码本身**：修正或删除会被模仿的样例，让正确写法成为最显眼的写法。
 2. **静态检查**：lint、类型、测试或 CI 规则。
-3. **规则**：本文件或模块 AGENTS——每次都必须知道、且无法从代码推断的约定。
+3. **规则**：每次都必须知道、且无法从代码推断的约定。
 4. **skill**：特定任务的流程。
-5. **风格指南**：readable-go / readable-typescript 的具体做法与正反例。
+5. **风格指南**：readable-go / readable-typescript——与项目无关的通用写法，不写本仓库路径。
 
-规则被 lint 或测试接管后，从文档中删除。
+落到规则或风格层时，按适用范围决定写到哪里：
+
+| 纠正的适用范围                                                 | 写到                                                                       |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 只在某个模块成立（提到本仓库的类型、函数、路径、错误码或流程） | 该模块 `CONVENTIONS.md` 的对应主题，配本仓库正例，反例注明来源（哪次纠正） |
+| 跨模块成立                                                     | 本文件「约定」                                                             |
+| 换一个同技术栈的项目仍成立                                     | readable 基线：在 agent-harness 仓库修改后同步到 `.agents/skills/`         |
+
+规则被 lint 或测试接管后，从文档中删除；与现有代码冲突时先改代码，agent 会跟随代码而不是规则。
 
 ## 测试与验证
 
 - 层级：L0 静态、L1 单元、L2 集成（临时 PostgreSQL/Redis）、L3 E2E、L4 真实外部（模型、E2B，按需手动）。
 - 行为变更在能观察到它的最低一层补测试；修 bug 先写在旧实现上失败的测试；读写存储的行为交给 L2。
-- hook 自动执行：编辑后格式化并修复该文件；回合结束对改动模块运行 check 与单元测试、测试防篡改与先红后绿检查，失败或出现新的待审项会退回。
-- 交付前：在仓库根目录运行 `scripts/verify-delivery.sh`（受影响模块的 L2/L3 与改动行变异测试）；对 diff 做一次独立审查（Claude Code 用 `code-review`，Codex 用 `/review`，标准为 readable 核心原则与模块 AGENTS）。阶段性汇报或提问的回合写明「未交付」。
+- hook 自动执行：编辑模块代码前核对本会话是否读过该模块 CONVENTIONS，没读则拒绝这次编辑；编辑后格式化并修复该文件；回合结束对改动模块运行 check 与单元测试、测试防篡改与先红后绿检查，失败或出现新的待审项会退回。
+- 交付前：在仓库根目录运行 `scripts/verify-delivery.sh`（受影响模块的 L2/L3 与改动行变异测试）；对 diff 做一次独立审查（Claude Code 用 `code-review`，Codex 用 `/review`，标准为 readable 核心原则与模块 CONVENTIONS）。阶段性汇报或提问的回合写明「未交付」。
 - 结论以本次实际执行为准，按层分别报告通过、失败、跳过与未运行；环境阻塞不算完成。
 - 保留工作区已有的他人改动，只清理本次创建的测试资源。
 
 ## 交付说明
 
-按 [PR 模板](.github/pull_request_template.md) 的结构汇报：改动说明、影响评估、验证结果（按层）、测试改动说明、剩余风险；另列本次使用的 skill（未使用写「未使用」）。
+按 [PR 模板](.github/pull_request_template.md) 的结构汇报：改动说明、影响评估、验证结果（按层）、测试改动说明、剩余风险；另列本次读过的 CONVENTIONS 与使用的 skill（未使用写「未使用」）。
 
 ## 约定
 

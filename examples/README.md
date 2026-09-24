@@ -13,11 +13,12 @@
 | `scripts/mutation.mjs` | 改动行变异测试 | 源码范围与变异工具 |
 | `scripts/check-doc-links.mjs` | 文档链接检查 | 归档目录 |
 | `hooks/after-edit.mjs`、`hooks/verify-changes.sh` | 编辑后与回合结束 hook | 各模块的格式化、修复与检查命令 |
+| `hooks/before-edit.mjs`（含自测）、`hooks/edited-files.mjs` | 编辑前核对已读模块 CONVENTIONS | 基本通用（按「模块/CONVENTIONS.md」约定） |
 | `hooks/claude-settings.json`、`hooks/codex-hooks.json` | hook 注册 | 脚本路径 |
 | `github/workflows/ci.yml`、`github/pull_request_template.md` | CI 分层与汇总、PR 结构 | job 与命令 |
 | `go/declorder/` | 声明顺序检查与自动归位（go/ast） | 基本通用 |
 | `config/golangci.yml`、`config/go-Makefile`、`config/eslint.*.mjs` | lint 与护栏配置 | 分层规则中的目录与包路径、框架预设 |
-| `readable/readable-go/`、`readable/readable-typescript/` | 项目化后的风格指南（引导词配本仓库例子、项目特有主题） | 全部例子、路径与约定 |
-| `AGENTS.example.md` | 根 AGENTS 的结构 | 全部内容 |
+| `conventions/*.CONVENTIONS.md` | 模块项目约定（基线之上的本仓库规则与正反例） | 全部内容 |
+| `AGENTS.example.md` | 根 AGENTS 的结构（何时读、工具表、纠正回路） | 全部内容 |
 
 重写完成后，按 [../modes/adopt.md](../modes/adopt.md) 各阶段的完成标准验证。

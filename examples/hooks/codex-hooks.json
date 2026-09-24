@@ -1,5 +1,18 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "apply_patch|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)\"/.agents/hooks/before-edit.mjs",
+            "timeout": 30,
+            "statusMessage": "核对是否已读模块 CONVENTIONS…"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "apply_patch|Edit|Write|MultiEdit",

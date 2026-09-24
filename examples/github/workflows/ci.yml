@@ -30,7 +30,7 @@ jobs:
       - name: 检查 GitHub Actions 工作流（actionlint）
         run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.12
       - name: 验证脚本自测（防篡改检查等）
-        run: node --test scripts/*.test.mjs
+        run: node --test scripts/*.test.mjs .agents/hooks/*.test.mjs
 
   verification:
     name: 验证工具 · 测试防篡改 + 先红后绿 + 变异测试（相对 main）
