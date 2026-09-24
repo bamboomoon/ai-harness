@@ -1,14 +1,19 @@
-# Go 模块
+# Go：候选工具与选择依据
 
-- **检查入口**：`Makefile` 的 `check`（golangci-lint + 声明顺序 + 生成代码一致性）与 `test`；`integration`、`e2e` 调用临时环境脚本。
-- **工具锁定**：独立的 `tools.mod`，`go get -modfile=tools.mod -tool <pkg>`，运行 `go tool -modfile=tools.mod <tool>`，不污染生产 `go.mod`；工具以 `CGO_ENABLED=0` 构建，不依赖本机 cgo 链接器。
-- **golangci-lint v2**：`default: standard` + bodyclose、errorlint、exhaustive（default 视为穷尽）、nilerr、rowserrcheck、sqlclosecheck、unparam（测试文件除外）、depguard、gocognit(20)、funlen、dupl（后三者测试文件除外）；formatters gofmt + goimports；`exclusions.presets: [std-error-handling]`；lint 同时带 `--build-tags=e2e,integration`。
-- **依赖方向（depguard）**：生成代码只在 `repo.go`；领域包除 handler/middleware/model 外不导入 HTTP 框架与传输层包；service/repo 不导入 `net/http`。拿一个故意的违规验证规则生效。
-- **声明顺序**：go/ast 小工具——只约束调用者全在本文件的未导出函数，必须位于首个调用者之后，带 `-w` 自动归位（按调用链逐层移动）。编辑后 hook 调用 `-w`，check 调用检查模式。
-- **代码生成**：sqlc 用 `sqlc diff` 纳入 check；规则写「改 SQL 后 make generate」。
-- **测试**：L1 标准 `testing`，服务未注入依赖保持零值；L2 `*_integration_test.go` + `integration` 标签 + 一个只在该标签下编译的 `testdb` 包（从 `DATABASE_URL` 取连接、提供已关闭连接池用于故障路径、随机账号）；L3 Ginkgo/Gomega，运行编译后的生产二进制。
-- **校验**：binding 标签为唯一来源，领域格式规则在领域包定义一次并由传输层注册为自定义标签；失败响应的 `data` 为 null，信息在本地化 `msg`。
-- **变异**：gremlins（见 verification.md 的参数与坑）。
+优先沿用项目已有的工具与入口（Makefile、Taskfile、脚本）；下面是缺失时的候选，以及选择时要判断的事。
+
+| 目标 | 候选 | 判断 |
+| --- | --- | --- |
+| 统一入口 | 项目已有的任务运行器；没有时 Makefile | 与 CI 使用同一条命令 |
+| 工具版本锁定 | `go.mod` 的 `tool` 指令；独立 `tools.mod` + `go tool -modfile=` | 工具依赖多或会影响生产依赖版本时用独立 modfile |
+| lint 与格式 | golangci-lint（v2 配置）；gofmt/goimports | 从 `default: standard` 起步，逐项加入能拦截真实问题的 linter，先看存量再开启 |
+| 依赖方向 | golangci 的 depguard（可按文件 glob 设规则） | 规则来自项目实际分层：哪些文件可接触传输层、持久化生成代码只在哪一层 |
+| Clean Code 护栏 | gocognit、funlen、dupl | 只约束生产代码，阈值作上限 |
+| 声明顺序（Stepdown） | 基于 go/ast 的小工具（检查未导出函数位于首个调用者之后，带自动归位），见 examples | 用户在意阅读顺序时加入 |
+| 生成代码一致性 | 生成器自带的 diff/check（如 `sqlc diff`），或生成后 `git diff --exit-code` | 项目有代码生成时必须加，否则 agent 可能手写生成代码 |
+| L2 测试 | build tag 隔离的集成测试 + 一个只在该标签下编译的测试辅助包；或 Testcontainers-go | 沿用项目已有方式 |
+| L3 测试 | 运行编译后的生产二进制；Ginkgo/Gomega 或标准 testing | 沿用项目已有框架 |
+| 变异测试 | gremlins（打开 `--invert-logical`、放宽 `--timeout-coefficient`） | 按包运行，再按改动行过滤 |
 
 ## 已知问题
 
