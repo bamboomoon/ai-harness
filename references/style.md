@@ -30,5 +30,5 @@
 - 每条规则配本仓库正例，注明来源（哪次纠正或实验）；能 lint 的写成 lint 后删除规则。
 - 规则与现有代码冲突时，先改代码或暂不写规则——agent 跟随代码而不是规则。
 - 必守项写进 CONVENTIONS 而不是只写进 skill（实验中约一半 agent 没有加载 skill）；AGENTS 指向它的那一行写清触发条件并标「必读」。
-- 交付前独立审查（Claude Code `code-review`、Codex `/review`）以核心原则与模块 AGENTS 为标准。
+- 交付前独立审查（Claude Code `code-review`、Codex `/review`）以 readable 核心原则与模块 CONVENTIONS 为标准。
 - 定期对规则做删除测试：去掉后行为不变的是 no-op，删除。

@@ -10,12 +10,18 @@
 - 业务判定（重名、权限、状态、存在性）留在 service，返回领域错误。
 
 ```go
-type listUsersRequest struct {
+// admin/model.go 的 createUserRequest：领域规则以自定义标签引用
+type createUserRequest struct {
+	Account string `json:"account" binding:"account"`
+
+	Password string `json:"password" binding:"password"`
+}
+
+// modelconfig/model.go 的 listQuery：分页与筛选约束同样只写在标签上
+type listQuery struct {
 	httpjson.Pagination
-
-	Status *user.Status `form:"status" binding:"omitnil,oneof=1 2"`
-
-	Keyword *string `form:"keyword" binding:"omitnil,alpha,max=12"`
+	Keyword     string "form:\"keyword\" binding:\"excludesrune=\x00\""
+	EnabledOnly bool   `form:"enabledOnly"`
 }
 
 // 反例：标签已能表达的规则，service 又手写一遍（auth/service.go 的 login 曾经如此）
